@@ -16,8 +16,8 @@ if gameinfo.getromname() == "Super Mario World (USA)" then
 		"Left",
 		"Right",
 	}
-elseif gameinfo.getromname() == "Super Mario Bros." then
-	Filename = "SMB1-1.state"
+elseif gameinfo.getromname() == ("Super Mario Bros.") or ("Super Mario Bros 2 Lost Levels") or ("Super Mario Bros 3") then
+	Filename = ("SMB1-1.state") or ("SMBLL1-1") or ("SMB3-1-1")
 	ButtonNames = {
 		"A",
 		"B",
@@ -26,26 +26,26 @@ elseif gameinfo.getromname() == "Super Mario Bros." then
 		"Left",
 		"Right",
 	}
-elseif gameinfo.getromname() == "Super Mario Bros 2 Lost Levels" then
-	Filename = "SMBLL1-1.state"
-	ButtonNames = {
-		"A",
-		"B",
-		"Up",
-		"Down",
-		"Left",
-		"Right",
-	}
-elseif gameinfo.getromname() == "Super Mario Bros 3" then
-	Filename = "SMB3-1-1.state"
-	ButtonNames = {
-		"A",
-		"B",
-		"Up",
-		"Down",
-		"Left",
-		"Right",
-	}
+--elseif gameinfo.getromname() == "Super Mario Bros 2 Lost Levels" then
+--	Filename = "SMBLL1-1.state"
+--	ButtonNames = {
+--		"A",
+--		"B",
+--		"Up",
+--		"Down",
+--		"Left",
+--		"Right",
+--	}
+--elseif gameinfo.getromname() == "Super Mario Bros 3" then
+--	Filename = "SMB3-1-1.state"
+--	ButtonNames = {
+--		"A",
+--		"B",
+--		"Up",
+--		"Down",
+--		"Left",
+--		"Right",
+--	}
 end
 
 BoxRadius = 6
