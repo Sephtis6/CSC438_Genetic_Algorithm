@@ -3,7 +3,11 @@
 -- Intended for use with the BizHawk emulator and Super Mario World or Super Mario Bros. ROM.
 -- For SMW, make sure you have a save state named "DP1.state" at the beginning of a level,
 -- and put a copy in both the Lua folder and the root directory of BizHawk.
-
+--this section grabs the name of the rom used
+print(gameinfo.getromname())
+--this section looks at the name and then depending on the name sets up which 
+--savefile to use along with the buttons used
+--to get the name from the rom run it in emuhawk and grab the name that shows up on the top when that rom is selected
 if gameinfo.getromname() == "Super Mario World (USA)" then
 	Filename = "DP1.state"
 	ButtonNames = {
@@ -16,8 +20,8 @@ if gameinfo.getromname() == "Super Mario World (USA)" then
 		"Left",
 		"Right",
 	}
-elseif gameinfo.getromname() == ("Super Mario Bros.") or ("Super Mario Bros 2 Lost Levels") or ("Super Mario Bros 3") then
-	Filename = ("SMB1-1.state") or ("SMBLL1-1") or ("SMB3-1-1")
+elseif gameinfo.getromname() == "Super Mario Bros." then
+	Filename = "SMB1-1.state"
 	ButtonNames = {
 		"A",
 		"B",
@@ -26,41 +30,43 @@ elseif gameinfo.getromname() == ("Super Mario Bros.") or ("Super Mario Bros 2 Lo
 		"Left",
 		"Right",
 	}
---elseif gameinfo.getromname() == "Super Mario Bros 2 Lost Levels" then
---	Filename = "SMBLL1-1.state"
---	ButtonNames = {
---		"A",
---		"B",
---		"Up",
---		"Down",
---		"Left",
---		"Right",
---	}
---elseif gameinfo.getromname() == "Super Mario Bros 3" then
---	Filename = "SMB3-1-1.state"
---	ButtonNames = {
---		"A",
---		"B",
---		"Up",
---		"Down",
---		"Left",
---		"Right",
---	}
+elseif gameinfo.getromname() == "Super Mario Bros 2 (Lost Levels) (Unl)" then
+	Filename = "SMBLL1-1.state"
+	ButtonNames = {
+		"A",
+		"B",
+		"Up",
+		"Down",
+		"Left",
+		"Right",
+	}
+elseif gameinfo.getromname() == "Super Mario Bros 3 by S.Pukin (SMB3 PRG1 Hack)" then
+	Filename = "SMB3-1-1.state"
+	ButtonNames = {
+		"A",
+		"B",
+		"Up",
+		"Down",
+		"Left",
+		"Right",
+	}
 end
-
+--radius for the box and input in the map
 BoxRadius = 6
 InputSize = (BoxRadius*2+1)*(BoxRadius*2+1)
-
+--prints bittons used to the gui
+print(ButtonNames)
+--increases the input size and then displays the outputs of the button names
 Inputs = InputSize+1
 Outputs = #ButtonNames
-
+--sets the population, joints, weights and threshhold for the delta
 Population = 300
 DeltaDisjoint = 2.0
 DeltaWeights = 0.4
 DeltaThreshold = 1.0
-
+--sets the number of species
 StaleSpecies = 15
-
+--sets all the data for the change of mutations and such for the algorithm
 MutateConnectionsChance = 0.25
 PerturbChance = 0.90
 CrossoverChance = 0.75
@@ -70,11 +76,11 @@ BiasMutationChance = 0.40
 StepSize = 0.1
 DisableMutationChance = 0.4
 EnableMutationChance = 0.2
-
+--uses a constant time
 TimeoutConstant = 20
-
+--shows how many nodes are max possible
 MaxNodes = 1000000
-
+--gets the position of the game by gettingt he layers of the game from the rom itself
 function getPositions()
 	if gameinfo.getromname() == "Super Mario World (USA)" then
 		marioX = memory.read_s16_le(0x94)
@@ -91,13 +97,13 @@ function getPositions()
 	
 		screenX = memory.readbyte(0x03AD)
 		screenY = memory.readbyte(0x03B8)
-	elseif gameinfo.getromname() == "Super Mario Bros 2 Lost Levels" then
+	elseif gameinfo.getromname() == "Super Mario Bros 2 (Lost Levels) (Unl)" then
 		marioX = memory.readbyte(0x6D) * 0x100 + memory.readbyte(0x86)
 		marioY = memory.readbyte(0x03B8)+16
 	
 		screenX = memory.readbyte(0x03AD)
 		screenY = memory.readbyte(0x03B8)
-	elseif gameinfo.getromname() == "Super Mario Bros 3" then
+	elseif gameinfo.getromname() == "Super Mario Bros 3 by S.Pukin (SMB3 PRG1 Hack)" then
 		marioX = memory.readbyte(0x6D) * 0x100 + memory.readbyte(0x86)
 		marioY = memory.readbyte(0x03B8)+16
 	
@@ -105,7 +111,7 @@ function getPositions()
 		screenY = memory.readbyte(0x03B8)
 	end
 end
-
+--gets the amount of tiles for the game based on the rom itself and then calculating the floor and how big the entire thing is
 function getTile(dx, dy)
 	if gameinfo.getromname() == "Super Mario World (USA)" then
 		x = math.floor((marioX+dx+8)/16)
@@ -130,7 +136,7 @@ function getTile(dx, dy)
 		else
 			return 0
 		end
-	elseif gameinfo.getromname() == "Super Mario Bros 2 Lost Levels" then
+	elseif gameinfo.getromname() == "Super Mario Bros 2 (Lost Levels) (Unl)" then
 		local x = marioX + dx + 8
 		local y = marioY + dy - 16
 		local page = math.floor(x/256)%2
@@ -148,7 +154,7 @@ function getTile(dx, dy)
 		else
 			return 0
 		end
-	elseif gameinfo.getromname() == "Super Mario Bros 3" then
+	elseif gameinfo.getromname() == "Super Mario Bros 3 by S.Pukin (SMB3 PRG1 Hack)" then
 		local x = marioX + dx + 8
 		local y = marioY + dy - 16
 		local page = math.floor(x/256)%2
@@ -168,7 +174,7 @@ function getTile(dx, dy)
 		end
 	end
 end
-
+--grabs the sprites that are used in the game from its rom
 function getSprites()
 	if gameinfo.getromname() == "Super Mario World (USA)" then
 		local sprites = {}
@@ -194,7 +200,7 @@ function getSprites()
 		end
 		
 		return sprites
-	elseif gameinfo.getromname() == "Super Mario Bros 2 Lost Levels" then
+	elseif gameinfo.getromname() == "Super Mario Bros 2 (Lost Levels) (Unl)" then
 		local sprites = {}
 		for slot=0,4 do
 			local enemy = memory.readbyte(0xF+slot)
@@ -206,7 +212,7 @@ function getSprites()
 		end
 		
 		return sprites
-	elseif gameinfo.getromname() == "Super Mario Bros 3" then
+	elseif gameinfo.getromname() == "Super Mario Bros 3 by S.Pukin (SMB3 PRG1 Hack)" then
 		local sprites = {}
 		for slot=0,4 do
 			local enemy = memory.readbyte(0xF+slot)
@@ -220,7 +226,7 @@ function getSprites()
 		return sprites
 	end
 end
-
+--grabs the aditional sprites from the rom if it has any
 function getExtendedSprites()
 	if gameinfo.getromname() == "Super Mario World (USA)" then
 		local extended = {}
@@ -236,13 +242,14 @@ function getExtendedSprites()
 		return extended
 	elseif gameinfo.getromname() == "Super Mario Bros." then
 		return {}
-	elseif gameinfo.getromname() == "Super Mario Bros 2 Lost Levels" then
+	elseif gameinfo.getromname() == "Super Mario Bros 2 (Lost Levels) (Unl)" then
 		return {}
-	elseif gameinfo.getromname() == "Super Mario Bros 3" then
+	elseif gameinfo.getromname() == "Super Mario Bros 3 by S.Pukin (SMB3 PRG1 Hack)" then
 		return {}
 	end
 end
-
+--this is used for the algorithm to be able to simulate inputs and then record which is pressed when so that it can 
+--adapt to what presses give the best results for future use
 function getInputs()
 	getPositions()
 	
@@ -283,16 +290,16 @@ function getInputs()
 	
 	return inputs
 end
-
+--calculates the sigmoid
 function sigmoid(x)
 	return 2/(1+math.exp(-4.9*x))-1
 end
-
+--creates a new innovation
 function newInnovation()
 	pool.innovation = pool.innovation + 1
 	return pool.innovation
 end
-
+--creates a new pool for the species, gen, innovation and other similar data
 function newPool()
 	local pool = {}
 	pool.species = {}
@@ -305,7 +312,7 @@ function newPool()
 	
 	return pool
 end
-
+--creates a new species for when there is a new pool creates/new species
 function newSpecies()
 	local species = {}
 	species.topFitness = 0
@@ -315,7 +322,7 @@ function newSpecies()
 	
 	return species
 end
-
+--creates a new genome for when there is a new pool creates/new genome
 function newGenome()
 	local genome = {}
 	genome.genes = {}
@@ -335,7 +342,7 @@ function newGenome()
 	
 	return genome
 end
-
+--copies the current genome in order to create a duplicate genome for when the original genome adapts/updates/changes
 function copyGenome(genome)
 	local genome2 = newGenome()
 	for g=1,#genome.genes do
@@ -351,7 +358,7 @@ function copyGenome(genome)
 	
 	return genome2
 end
-
+--the basic genome structure
 function basicGenome()
 	local genome = newGenome()
 	local innovation = 1
@@ -361,7 +368,7 @@ function basicGenome()
 	
 	return genome
 end
-
+--creates a new gene for the genome
 function newGene()
 	local gene = {}
 	gene.into = 0
@@ -372,7 +379,7 @@ function newGene()
 	
 	return gene
 end
-
+--copies the current genome to be able to be used later
 function copyGene(gene)
 	local gene2 = newGene()
 	gene2.into = gene.into
@@ -383,7 +390,7 @@ function copyGene(gene)
 	
 	return gene2
 end
-
+--creates a new neuron to be used in the genome
 function newNeuron()
 	local neuron = {}
 	neuron.incoming = {}
@@ -391,7 +398,7 @@ function newNeuron()
 	
 	return neuron
 end
-
+--creates a network using the various data collects to create the genome itself that is always adapting and updating
 function generateNetwork(genome)
 	local network = {}
 	network.neurons = {}
@@ -423,7 +430,7 @@ function generateNetwork(genome)
 	
 	genome.network = network
 end
-
+--evaluates how the current genome is working and whether it needs to be updated, is still running well, orh as a problem that needs to be fixed
 function evaluateNetwork(network, inputs)
 	table.insert(inputs, 1)
 	if #inputs ~= Inputs then
@@ -460,7 +467,7 @@ function evaluateNetwork(network, inputs)
 	
 	return outputs
 end
-
+--checks about whether the new genome is better then the original genome when it updates the genomes
 function crossover(g1, g2)
 	-- Make sure g1 is the higher fitness genome
 	if g2.fitness > g1.fitness then
@@ -495,7 +502,7 @@ function crossover(g1, g2)
 	
 	return child
 end
-
+--generates a random nueron in order to simulate inputs that it does not know to advance the algorithm
 function randomNeuron(genes, nonInput)
 	local neurons = {}
 	if not nonInput then
@@ -530,7 +537,7 @@ function randomNeuron(genes, nonInput)
 	
 	return 0
 end
-
+--creates a constant link between the genes to create the pattern used
 function containsLink(genes, link)
 	for i=1,#genes do
 		local gene = genes[i]
@@ -539,7 +546,7 @@ function containsLink(genes, link)
 		end
 	end
 end
-
+--checks to see if the genome is at a point that it mutates
 function pointMutate(genome)
 	local step = genome.mutationRates["step"]
 	
@@ -552,7 +559,7 @@ function pointMutate(genome)
 		end
 	end
 end
-
+--links the mutated genome to the genes and neurons to keep all the old progress while still moving forward
 function linkMutate(genome, forceBias)
 	local neuron1 = randomNeuron(genome.genes, false)
 	local neuron2 = randomNeuron(genome.genes, true)
@@ -583,7 +590,7 @@ function linkMutate(genome, forceBias)
 	
 	table.insert(genome.genes, newLink)
 end
-
+--a node for thwne the genome mutates so that everything is moved smoothly
 function nodeMutate(genome)
 	if #genome.genes == 0 then
 		return
@@ -610,7 +617,7 @@ function nodeMutate(genome)
 	gene2.enabled = true
 	table.insert(genome.genes, gene2)
 end
-
+--enables or disables the mutate function
 function enableDisableMutate(genome, enable)
 	local candidates = {}
 	for _,gene in pairs(genome.genes) do
@@ -626,7 +633,7 @@ function enableDisableMutate(genome, enable)
 	local gene = candidates[math.random(1,#candidates)]
 	gene.enabled = not gene.enabled
 end
-
+--function taht mutates the genome itself to advance the algorithm
 function mutate(genome)
 	for mutation,rate in pairs(genome.mutationRates) do
 		if math.random(1,2) == 1 then
@@ -680,7 +687,7 @@ function mutate(genome)
 		p = p - 1
 	end
 end
-
+--disjoins genes that are not used in the mutated genome or are not used or helpful to the algorithm
 function disjoint(genes1, genes2)
 	local i1 = {}
 	for i = 1,#genes1 do
@@ -713,7 +720,7 @@ function disjoint(genes1, genes2)
 	
 	return disjointGenes / n
 end
-
+--gets the weights of the genes actions to be able to decide whether helpful or not in the future
 function weights(genes1, genes2)
 	local i2 = {}
 	for i = 1,#genes2 do
@@ -734,13 +741,13 @@ function weights(genes1, genes2)
 	
 	return sum / coincident
 end
-	
+--function to check if the genes are the sameSpecies or not
 function sameSpecies(genome1, genome2)
 	local dd = DeltaDisjoint*disjoint(genome1.genes, genome2.genes)
 	local dw = DeltaWeights*weights(genome1.genes, genome2.genes) 
 	return dd + dw < DeltaThreshold
 end
-
+-- function to rank the fitness based on the actions taken
 function rankGlobally()
 	local global = {}
 	for s = 1,#pool.species do
@@ -757,7 +764,7 @@ function rankGlobally()
 		global[g].globalRank = g
 	end
 end
-
+--finds the average fitness of the species and genomes used so far
 function calculateAverageFitness(species)
 	local total = 0
 	
@@ -768,7 +775,7 @@ function calculateAverageFitness(species)
 	
 	species.averageFitness = total / #species.genomes
 end
-
+--gets the total average fitness over all the various parts so far
 function totalAverageFitness()
 	local total = 0
 	for s = 1,#pool.species do
@@ -778,7 +785,7 @@ function totalAverageFitness()
 
 	return total
 end
-
+--removes the species that are not being used or have been passed by
 function cullSpecies(cutToOne)
 	for s = 1,#pool.species do
 		local species = pool.species[s]
@@ -796,7 +803,7 @@ function cullSpecies(cutToOne)
 		end
 	end
 end
-
+--checks whether to create a child of the species to advance the algorithm further
 function breedChild(species)
 	local child = {}
 	if math.random() < CrossoverChance then
@@ -812,7 +819,7 @@ function breedChild(species)
 	
 	return child
 end
-
+--removes the stale and unused species from the algorithm
 function removeStaleSpecies()
 	local survived = {}
 
@@ -836,7 +843,7 @@ function removeStaleSpecies()
 
 	pool.species = survived
 end
-
+--removes the weak species from the algorithm
 function removeWeakSpecies()
 	local survived = {}
 
@@ -852,7 +859,7 @@ function removeWeakSpecies()
 	pool.species = survived
 end
 
-
+--adds a child to the species to advance the algorithm
 function addToSpecies(child)
 	local foundSpecies = false
 	for s=1,#pool.species do
@@ -869,7 +876,7 @@ function addToSpecies(child)
 		table.insert(pool.species, childSpecies)
 	end
 end
-
+--creates a new generation by removing the previous generation and keeping only the data that advances the algorithm
 function newGeneration()
 	cullSpecies(false) -- Cull the bottom half of each species
 	rankGlobally()
@@ -903,7 +910,7 @@ function newGeneration()
 	
 	writeFile("backup." .. pool.generation .. "." .. forms.gettext(saveLoadFile))
 end
-	
+	--initializes a new pool
 function initializePool()
 	pool = newPool()
 
@@ -914,7 +921,7 @@ function initializePool()
 
 	initializeRun()
 end
-
+--clears all the inputs so far
 function clearJoypad()
 	controller = {}
 	for b = 1,#ButtonNames do
@@ -922,7 +929,7 @@ function clearJoypad()
 	end
 	joypad.set(controller)
 end
-
+--initializes the run by using the data so far and the savestate used
 function initializeRun()
 	savestate.load(Filename);
 	rightmost = 0
@@ -935,7 +942,7 @@ function initializeRun()
 	generateNetwork(genome)
 	evaluateCurrent()
 end
-
+--evaluates the current pool species and genome to choose what button to press and send to the controller/joypad
 function evaluateCurrent()
 	local species = pool.species[pool.currentSpecies]
 	local genome = species.genomes[pool.currentGenome]
@@ -954,12 +961,12 @@ function evaluateCurrent()
 
 	joypad.set(controller)
 end
-
+--creates a pool if there is no pool
 if pool == nil then
 	initializePool()
 end
 
-
+--creates the next genome based off of the current genome
 function nextGenome()
 	pool.currentGenome = pool.currentGenome + 1
 	if pool.currentGenome > #pool.species[pool.currentSpecies].genomes then
@@ -971,14 +978,14 @@ function nextGenome()
 		end
 	end
 end
-
+--checks if the fitness has been measured yet
 function fitnessAlreadyMeasured()
 	local species = pool.species[pool.currentSpecies]
 	local genome = species.genomes[pool.currentGenome]
 	
 	return genome.fitness ~= 0
 end
-
+--displays the current data collected to the viewer when it is marked true
 function displayGenome(genome)
 	local network = genome.network
 	local cells = {}
@@ -1105,7 +1112,7 @@ function displayGenome(genome)
 		end
 	end
 end
-
+--writes the current data collected to a file when chosen
 function writeFile(filename)
         local file = io.open(filename, "w")
 	file:write(pool.generation .. "\n")
@@ -1140,12 +1147,12 @@ function writeFile(filename)
         end
         file:close()
 end
-
+--saves the current poot to a file
 function savePool()
 	local filename = forms.gettext(saveLoadFile)
 	writeFile(filename)
 end
-
+--used to load a file with the previous data collected when used
 function loadFile(filename)
         local file = io.open(filename, "r")
 	pool = newPool()
@@ -1192,12 +1199,12 @@ function loadFile(filename)
 	initializeRun()
 	pool.currentFrame = pool.currentFrame + 1
 end
- 
+--loads the pool from the file
 function loadPool()
 	local filename = forms.gettext(saveLoadFile)
 	loadFile(filename)
 end
-
+--sets everything up to initialize the run
 function playTop()
 	local maxfitness = 0
 	local maxs, maxg
@@ -1219,15 +1226,15 @@ function playTop()
 	pool.currentFrame = pool.currentFrame + 1
 	return
 end
-
+--destroys data when exiting
 function onExit()
 	forms.destroy(form)
 end
-
+--data for the writefile
 writeFile("temp.pool")
-
+--event for the oneexit
 event.onexit(onExit)
-
+--the various buttons foe the gui
 form = forms.newform(200, 260, "Fitness")
 maxFitnessLabel = forms.label(form, "Max Fitness: " .. math.floor(pool.maxFitness), 5, 8)
 showNetwork = forms.checkbox(form, "Show Map", 5, 30)
@@ -1240,7 +1247,7 @@ saveLoadLabel = forms.label(form, "Save/Load:", 5, 129)
 playTopButton = forms.button(form, "Play Top", playTop, 5, 170)
 hideBanner = forms.checkbox(form, "Hide Banner", 5, 190)
 
-
+--while it is try do everyhting that follows for the gui and program itself
 while true do
 	local backgroundColor = 0xD0FFFFFF
 	if not forms.ischecked(hideBanner) then
