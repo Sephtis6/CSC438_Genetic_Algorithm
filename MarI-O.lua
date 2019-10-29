@@ -5,6 +5,7 @@
 -- and put a copy in both the Lua folder and the root directory of BizHawk.
 --this section grabs the name of the rom used
 print(gameinfo.getromname())
+print("MarI/O is an AI that plays Super Mario Bros 1 and Super Mario World. This version of it can play Super Mario Bros 2: The Lost Levels and Super Mario Bros 3 on the NES Emulator, Bizhawk.")
 --this section looks at the name and then depending on the name sets up which 
 --savefile to use along with the buttons used
 --to get the name from the rom run it in emuhawk and grab the name that shows up on the top when that rom is selected
@@ -55,6 +56,7 @@ end
 BoxRadius = 6
 InputSize = (BoxRadius*2+1)*(BoxRadius*2+1)
 --prints bittons used to the gui
+print("After confirming the reference of buttons from lines 11 through 48, the program will now test and show referencec to the buttons displayed for the game.")
 print(ButtonNames)
 --increases the input size and then displays the outputs of the button names
 Inputs = InputSize+1
@@ -80,6 +82,7 @@ EnableMutationChance = 0.2
 TimeoutConstant = 20
 --shows how many nodes are max possible
 MaxNodes = 1000000
+print("After finding the buttons its time to figure out where mario is in the respective games.")
 --gets the position of the game by gettingt he layers of the game from the rom itself
 function getPositions()
 	if gameinfo.getromname() == "Super Mario World (USA)" then
